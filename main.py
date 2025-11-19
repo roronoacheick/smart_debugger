@@ -2,19 +2,11 @@ import subprocess
 import sys
 from pathlib import Path
 from config import GROQ_API_KEY
+from debugger_agent import call_groq_api  # NEW IMPORT
 
 
 def run_script(script_path: str):
-    """
-    Run a Python script in a separate process and return its output and error.
-
-    script_path: path to the script you want to execute (ex: "bug.py")
-
-    Returns:
-        stdout (str): printed output from the script
-        stderr (str): error message (if the script crashed)
-        returncode (int): 0 means success, anything else means failure
-    """
+   
     process = subprocess.run(
         [sys.executable, script_path],  # run the script using the venv interpreter
         capture_output=True,            # capture stdout and stderr
@@ -42,6 +34,20 @@ def main():
 
     print("\n=== RETURN CODE ===")
     print(code)
+
+    
+    if code != 0:
+        print("\nError detected → sending to Groq...\n")
+
+        # Read the script content
+        with open(script, "r", encoding="utf-8") as f:
+            script_content = f.read()
+
+        # Send script + error to Groq
+        llm_response = call_groq_api(script_content, stderr)
+
+        print("\n=== LLM JSON RESPONSE ===")
+        print(llm_response)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
 - The user is a beginner in Python.
-- Explanations must be simple and explicit.
-- Prefer small, incremental fixes instead of rewriting entire files.
-- The main language for comments is French, but code stays in English.
+- Explanations should be simple and explicit.
+- Avoid jargon unless explained.
+- Keep fixes minimal and safe.
+- Code stays in English; explanations in French.
+- Be concise and precise.
