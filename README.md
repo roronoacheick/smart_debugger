@@ -1,95 +1,75 @@
-🛠️ Smart Debugger — Agent de Debugging Automatique (Groq + Streamlit)
+🛠️ Smart Debugger
+Agent de debugging autonome basé sur Groq + Streamlit
+<p align="left"> <img src="https://img.shields.io/badge/Python-3.10+-blue?logo=python" /> <img src="https://img.shields.io/badge/Streamlit-UI-red?logo=streamlit" /> <img src="https://img.shields.io/badge/Groq-API-orange?logo=bolt" /> <img src="https://img.shields.io/badge/AI-Powered-brightgreen?logo=githubcopilot" /> <img src="https://img.shields.io/badge/Status-Active-success" /> </p>
+📌 Description
 
 Smart Debugger est un agent autonome capable de :
 
-détecter automatiquement les erreurs d’un script Python
+détecter automatiquement les erreurs dans un script Python
 
-analyser l’erreur
-
-demander une correction au modèle Groq (LLaMA)
+analyser l’erreur via un modèle Groq LLaMA
 
 appliquer la correction directement dans le fichier source
 
-fournir une interface utilisateur simple et propre via Streamlit
+afficher les informations et corrections via une interface Streamlit
 
 
-🚀 Fonctionnalités
-
-✔ Exécution d’un script Python en sous-processus
-✔ Récupération de l’erreur (stderr)
-✔ Appel à l’API Groq pour analyse et correction
-✔ Réponse garantie au format JSON strict
-✔ Correction automatique en remplaçant uniquement la ligne erronée
-✔ Interface Streamlit intuitive :
-
-affichage du code source
-
-affichage de l’erreur
-
-proposition de correction
-
-application automatique
-✔ Aucun fichier temporaire / duplicata n’est créé
-✔ Utilisation simplifiée pour les débutants
-
-📦 Arborescence du projet
+📂 Structure du projet
 smart_debugger/
 │
-├── app.py                 # Interface Streamlit
-├── main.py                # Logique principale d'exécution et de correction
-├── debugger_agent.py      # Gestion de l’appel Groq + prompts
-├── json_utils.py          # Extraction et parsing JSON du LLM
-├── patch_utils.py         # Correction in-place du code Python
-├── config.py              # Chargement de la clé API Groq
+├── app.py                # Interface Streamlit
+├── main.py               # Logique principale d'exécution et de correction
+├── debugger_agent.py     # Appel Groq + gestion des prompts
+├── json_utils.py         # Extraction et parsing JSON du LLM
+├── patch_utils.py        # Correction in-place du script
+├── config.py             # Chargement de la clé GROQ_API_KEY
 │
-├── prompt.txt             # Prompt strict envoyé au modèle IA
-├── context.txt            # Contexte supplémentaire pour guider le modèle
+├── prompt.txt            # Instructions strictes pour le LLM
+├── context.txt           # Contexte additionnel
 │
-├── bug.py                 # Exemple de script volontairement buggé
-│
-├── requirements.txt       # Bibliothèques Python nécessaires
-└── README.md              # Documentation du projet
+├── bug.py                # Script volontairement buggé (exemple)
+├── requirements.txt      # Dépendances Python
+└── README.md             # Documentation
 
-⚙️ Installation
-1. Cloner le dépôt
-git clone https://github.com/ton-utilisateur/smart_debugger.git
+🚀 Installation
+1️⃣ Cloner le dépôt
+git clone https://github.com/tonusername/smart_debugger.git
 cd smart_debugger
 
-2. Créer et activer un environnement virtuel
+2️⃣ Créer un environnement virtuel
 python -m venv .venv
 source .venv/bin/activate   # macOS / Linux
-# OU
 .\.venv\Scripts\activate    # Windows
 
-3. Installer les dépendances
+3️⃣ Installer les dépendances
 pip install -r requirements.txt
 
-4. Ajouter votre clé API Groq dans un .env
+4️⃣ Ajouter la clé API Groq
 
 Crée un fichier .env :
 
-GROQ_API_KEY="ta_cle_api_icI"
+GROQ_API_KEY="ta_cle_api_groq_ici"
 
-🧠 Utilisation en ligne de commande
+⚡ Usage : ligne de commande
 
 Pour analyser et corriger automatiquement bug.py :
 
 python main.py
 
 
-Le programme :
+💡 Le script :
 
 exécute bug.py
 
-détecte une erreur
+détecte l’erreur
 
-envoie l’erreur et le code à Groq
+envoie l’erreur au LLM
 
 parse la réponse JSON
 
-corrige directement la ligne erronée dans bug.py
+corrige directement dans le fichier source
 
-réaffiche le code corrigé
+ré-affiche le code corrigé
 
 🖥️ Interface graphique (Streamlit)
 
@@ -98,31 +78,25 @@ Lancer l’interface :
 streamlit run app.py
 
 
-L’interface permet :
+Interface :
 
-de sélectionner un fichier Python
+🗂 Sélection du fichier Python
 
-de visualiser le code source
+🖨️ Affichage du code source
 
-d’exécuter le script
+❌ Affichage de l’erreur
 
-de voir l’erreur détectée
+🔧 Proposition de correction
 
-de recevoir la correction IA
+✔ Application automatique
 
-d’appliquer automatiquement la correction
+📄 Visualisation du code corrigé
 
-de visualiser le fichier mis à jour
+Aucun JSON brut n’est affiché pour ne pas perturber l’utilisateur.
 
-🤖 Fonctionnement de l’agent IA
+🧠 Fonctionnement de l’agent IA
 
-L’agent utilise deux fichiers :
-
-prompt.txt → instructions strictes au modèle
-
-context.txt → garde-fous, style d’écriture, contraintes
-
-L’IA est forcée de renvoyer un JSON du type :
+Le LLM doit renvoyer strictement ce JSON :
 
 {
   "error_summary": "",
@@ -135,59 +109,76 @@ L’IA est forcée de renvoyer un JSON du type :
 }
 
 
-Seul fixed_line est utilisé dans cette version (correction mono-ligne).
+Seul :
 
-🧪 Exemple d’erreur corrigée
+line_number
+
+fixed_line
+
+sont utilisés dans la version actuelle.
+
+✨ Correction mono-ligne, propre et minimale.
+
+🔧 Exemple de correction automatique
 
 Script buggé :
 
 def parler(messagee):
     print(messagee)
 
-parler("bonjour")
+parler("salut")
 
 
-L’IA détecte :
+Résultat produite par l’IA :
 
 line_number: 2
 fixed_line: print(message)
 
 
-Après correction :
+Script corrigé :
 
 def parler(message):
     print(message)
 
-parler("bonjour")
+parler("salut")
+
+
+Sans intervention humaine 🤖
 
 📌 Limitations actuelles
+Limitation	Explication
+Correction uniquement mono-ligne	Pensé pour éviter les risques d'hallucination du LLM
+Pas encore de mode multi-lignes sécurisé	Peut être ajouté ultérieurement
+Pas de backup automatique	(Peut être ajouté)
+Pas d’affichage de diff	(Option future possible)
+🔮 Améliorations futures
 
-version actuelle : correction d’une seule ligne
+Support des corrections multi-lignes
 
-pas encore de correction multi-lignes
+Système de backup automatique (bug_backup.py)
 
-dépend d’un prompt strict pour éviter les hallucinations du LLM
+Comparaison avant/après (diff)
 
-nécessite une clé API Groq
+Analyse de plusieurs erreurs successives
 
-(Des améliorations sont possibles, voir section suivante.)
+Historique des corrections appliquées
 
-🔮 Améliorations futures possibles
+Choix du modèle Groq dans l’UI
 
-Correction multi-lignes sécurisée
+Édition du code directement dans Streamlit
 
-Système de backup automatique avant patch
-
-Affichage du diff (avant/après)
-
-UI Streamlit plus complète (thème, onglets…)
-
-Historique des corrections
-
-Re-exécution automatique après correction
-
-📝 Auteur
+👨‍💻 Auteur
 
 Projet réalisé par Cheickna
-Dans le cadre d’un TP visant à apprendre :
-Débogage automatique, LLM, Groq API, Streamlit et IA appliquée au code.
+
+Agents autonomes
+
+Debugging intelligent
+
+Intégration API Groq
+
+Streamlit
+
+Parsing JSON robuste
+
+Correction automatique de code
