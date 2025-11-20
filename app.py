@@ -22,7 +22,7 @@ if "script_path" not in st.session_state:
 
 
 # --- Sélection du fichier ---
-st.subheader("Sélectionner un fichier Python à analyser")
+st.subheader("Sélectionner un fichier Python")
 
 python_files = [f for f in os.listdir(".") if f.endswith(".py")]
 
@@ -40,45 +40,41 @@ if st.button("Analyser le script"):
     # Exécuter le script
     stdout, stderr, code = run_script(script)
 
-    st.subheader("🖨️ Sortie du script")
+    st.subheader("📄 Code source")
+    st.code(st.session_state.source_code, language="python")
+
+    st.subheader("🖨️ Sortie du script (stdout)")
     st.text(stdout)
 
-    st.subheader("❌ Erreur détectée (stderr)")
+    st.subheader("❌ Erreur détectée")
     st.text(stderr)
 
     # Si erreur → envoyer au LLM
     if code != 0:
-        llm_response = call_groq_api(st.session_state.source_code, stderr)
-        
-        st.subheader("🧠 Réponse RAW du LLM")
-        st.text(llm_response)
-
-        # JSON
-        parsed = parse_llm_json(llm_response)
+        parsed = parse_llm_json(call_groq_api(st.session_state.source_code, stderr))
         st.session_state.parsed_json = parsed
 
-        st.subheader("🧪 JSON analysé")
-        st.json(parsed)
+        # --- AFFICHAGE RÉSUMÉ ET MINIMAL ---
+        line_number = parsed.get("line_number")
+        fixed_line = parsed.get("fixed_line")
 
-        st.success(f"Ligne à corriger : {parsed.get('line_number')} → {parsed.get('fixed_line')}")
+        st.success(f"🔧 Correction détectée :")
+        st.write(f"**Ligne à corriger :** `{line_number}`")
+        st.write(f"**Nouvelle ligne proposée :** `{fixed_line}`")
 
 
-# --- AFFICHAGE LORSQUE L'ANALYSE A DÉJÀ ÉTÉ FAITE ---
+# --- AFFICHAGE APRÈS ANALYSE ---
 if st.session_state.parsed_json:
     parsed = st.session_state.parsed_json
-
-    st.subheader("Correction proposée")
-    st.json(parsed)
-
     line_number = parsed.get("line_number")
     fixed_line = parsed.get("fixed_line")
 
-    # --- APPLIQUER LA CORRECTION ---
+    # BOUTON DE CORRECTION
     if st.button("Appliquer la correction automatiquement 🔧"):
         apply_line_patch(st.session_state.script_path, line_number, fixed_line)
         st.success("✔ Correction appliquée avec succès !")
 
-        # Recharger le code corrigé
+        # Réafficher le code après correction
         with open(st.session_state.script_path, "r", encoding="utf-8") as f:
             corrected = f.read()
 
